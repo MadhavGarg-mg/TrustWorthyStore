@@ -1,0 +1,6 @@
+{
+  "appName": "TestApp",
+  "version": "1.0.0",
+  "expectedHash": "315f5bdb76d078c43b8ac0064e4a016461a626f2c9d30e6d536c8e6e17a60a99",
+  "description": "A sample app file containing 'Hello, World!'"
+}

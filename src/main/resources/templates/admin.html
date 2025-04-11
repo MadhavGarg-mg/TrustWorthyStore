@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+        }
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 90%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+        }
+        th {
+            background-color: #333;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<div class="navbar">
+    <div><a th:href="@{/}">Home</a></div>
+    <div><a th:href="@{/logout}">Logout</a></div>
+</div>
+
+<h1>Admin Dashboard</h1>
+
+<h2>All Users</h2>
+<table>
+    <thead>
+    <tr><th>Email</th><th>Role</th></tr>
+    </thead>
+    <tbody>
+    <tr th:each="user : ${users}">
+        <td th:text="${user.email}">user@example.com</td>
+        <td th:text="${user.role}">USER</td>
+    </tr>
+    </tbody>
+</table>
+
+<h2>All Apps</h2>
+<table>
+    <thead>
+    <tr><th>Name</th><th>Uploader</th></tr>
+    </thead>
+    <tbody>
+    <tr th:each="app : ${apps}">
+        <td th:text="${app.name}">App Name</td>
+        <td th:text="${app.user.email}">uploader@example.com</td>
+    </tr>
+    </tbody>
+</table>
+
+<h2>Add Another Admin</h2>
+<form th:action="@{/admin/addAdmin}" method="post">
+    <input type="email" name="email" placeholder="Admin Email" required>
+    <input type="password" name="password" placeholder="Admin Password" required>
+    <button type="submit">Add Admin</button>
+</form>
+</body>
+</html>

@@ -1,0 +1,40 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    container_name: trustworthy-app-store
+    ports:
+      - "8443:8443"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/appstoredeveloper?useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=developer
+      - SPRING_DATASOURCE_PASSWORD=password123
+    depends_on:
+      - db
+    restart: always
+
+  db:
+    image: mysql:8.0
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: appstoredeveloper
+      MYSQL_USER: developer
+      MYSQL_PASSWORD: password123
+    ports:
+      - "3307:3306"
+    restart: always
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  checker:
+    build:
+      context: ./checker
+      dockerfile: Dockerfile.checker
+    container_name: flask-checker
+    ports:
+      - "5001:5000"
+    restart: always
+
+volumes:
+  mysql-data:
