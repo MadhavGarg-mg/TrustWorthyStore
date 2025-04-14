@@ -1,40 +1,56 @@
-version: '3.8'
+version: "3.8"
+
 services:
-  app:
-    build: .
-    container_name: trustworthy-app-store
+  mysql:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_DATABASE: appstore
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password123
+      MYSQL_ROOT_PASSWORD: password123
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - appnet
+
+  appstore:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      mysql:
+        condition: service_healthy
+      checker:
+        condition: service_started
     ports:
       - "8443:8443"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/appstoredeveloper?useSSL=false&allowPublicKeyRetrieval=true
-      - SPRING_DATASOURCE_USERNAME=developer
-      - SPRING_DATASOURCE_PASSWORD=password123
-    depends_on:
-      - db
-    restart: always
-
-  db:
-    image: mysql:8.0
-    container_name: mysql-db
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_DATABASE: appstoredeveloper
-      MYSQL_USER: developer
-      MYSQL_PASSWORD: password123
-    ports:
-      - "3307:3306"
-    restart: always
-    volumes:
-      - mysql-data:/var/lib/mysql
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/appstore
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password123
+      CHECKER_URL: http://checker:5000
+    networks:
+      - appnet
 
   checker:
     build:
       context: ./checker
       dockerfile: Dockerfile.checker
-    container_name: flask-checker
     ports:
-      - "5001:5000"
-    restart: always
+      - "5000:5000"
+    networks:
+      - appnet
 
 volumes:
-  mysql-data:
+  db_data:
+
+networks:
+  appnet:

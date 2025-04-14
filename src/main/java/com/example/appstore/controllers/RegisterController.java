@@ -1,7 +1,6 @@
 package com.example.appstore.controllers;
 
 import com.example.appstore.models.User;
-import com.example.appstore.repository.UserRepository;
 import com.example.appstore.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,35 +10,32 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 public class RegisterController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     @Autowired
-    private UserRepository userRepository;
+    public RegisterController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping("/register")
-    public String showRegistrationForm() {
+    public String showRegistrationForm(Model model) {
+        model.addAttribute("user", new User());
         return "register";
     }
 
     @PostMapping("/register")
-    public String registerUser(@RequestParam String email,
-                               @RequestParam String password,
-                               @RequestParam String confirmPassword,
-                               @RequestParam String role,
+    public String registerUser(@ModelAttribute("user") User user,
+                               @RequestParam("confirmPassword") String confirmPassword,
                                Model model) {
-
-        if (!password.equals(confirmPassword)) {
-            model.addAttribute("error", "Passwords do not match.");
+        if (userService.emailExists(user.getEmail())) {
+            model.addAttribute("error", "Email already exists");
             return "register";
         }
-
-        try {
-            userService.registerUser(email, password, role);
-            return "redirect:/login";
-        } catch (RuntimeException e) {
-            model.addAttribute("error", e.getMessage());
+        if (!user.getPassword().equals(confirmPassword)) {
+            model.addAttribute("error", "Passwords do not match");
             return "register";
         }
+        userService.registerUser(user);
+        return "redirect:/login";
     }
 }

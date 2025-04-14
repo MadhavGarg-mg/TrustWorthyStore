@@ -26,4 +26,4 @@ jobs:
       with:
         context: .
         push: true
-        tags: yourusername/trustworthystore:latest
+        tags: madhavgarg/trustworthystore:latest
