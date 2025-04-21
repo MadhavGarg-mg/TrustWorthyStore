@@ -4,46 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home - App Store</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-        }
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            background-color: #333;
-            color: white;
-        }
-        .navbar a {
-            color: white;
-            text-decoration: none;
-            padding: 10px 15px;
-        }
-        .nav-button {
-            background-color: #333;
-            color: white;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            height: 100%;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/styles.css">
 </head>
-<body>
-<div class="navbar">
-    <div>
-        <a href="/">Home</a>
-    </div>
-    <div>
-        <a href="/register">Register</a>
-        <a href="/login">Login</a>
-    </div>
-</div>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
 <h1>Welcome to the Trustworthy App Store</h1>
 <p>Your one-stop shop for secure and reliable applications.</p>
 </body>

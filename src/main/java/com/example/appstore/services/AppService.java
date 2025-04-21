@@ -5,9 +5,9 @@ import com.example.appstore.repository.AppEntryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class AppService {
@@ -15,15 +15,6 @@ public class AppService {
     @Autowired
     private AppEntryRepository appEntryRepository;
 
-    /**
-     * Saves the uploaded app and metadata files to the database.
-     *
-     * @param appName the name of the app
-     * @param appFile the main application file
-     * @param metadataFile the metadata file
-     * @return the saved AppEntry entity
-     * @throws IOException if reading file bytes fails
-     */
     public AppEntry saveAppAndMetadata(String appName, MultipartFile appFile, MultipartFile metadataFile) throws IOException {
         AppEntry entry = new AppEntry();
         entry.setAppName(appName);
@@ -31,5 +22,13 @@ public class AppService {
         entry.setMetadataFile(metadataFile.getBytes());
         entry.setUploadDate(LocalDateTime.now());
         return appEntryRepository.save(entry);
+    }
+
+    public List<AppEntry> getAllApps() {
+        return appEntryRepository.findAll();
+    }
+
+    public AppEntry getAppEntry(Long id) {
+        return appEntryRepository.findById(id).orElse(null);
     }
 }

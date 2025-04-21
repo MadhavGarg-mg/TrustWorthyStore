@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Manage Suspended Users</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<h1>Manage Suspended Users</h1>
+
+<div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+<div th:if="${error}"   class="alert alert-danger"  th:text="${error}"></div>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th><th>Email</th><th>Role</th><th>Suspended?</th><th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- With Option A, ${users} is *only* suspended accounts -->
+    <tr th:each="user : ${users}"
+        style="border-bottom:1px solid #eee;">
+        <td th:text="${user.id}">1</td>
+        <td th:text="${user.email}">dev@example.com</td>
+        <td th:text="${user.role}">DEVELOPER</td>
+        <td th:text="${user.suspended}">true</td>
+        <td>
+            <form th:action="@{/admin/user/{id}/unsuspend(id=${user.id})}"
+                  method="post">
+                <button type="submit">Unsuspend</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<p><a th:href="@{/admin/dashboard}">← Back to Dashboard</a></p>
+</body>
+</html>

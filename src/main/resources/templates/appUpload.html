@@ -1,56 +1,29 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Upload App</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-        }
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            background-color: #333;
-            color: white;
-        }
-        .navbar a {
-            color: white;
-            text-decoration: none;
-            padding: 10px 15px;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/styles.css"/>
 </head>
 <body>
-<div class="navbar">
-    <div>
-        <a th:href="@{/}">Home</a>
-    </div>
-    <div>
-        <a th:href="@{/register}">Register</a>
-        <a th:href="@{/login}">Login</a>
-    </div>
-</div>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
 
 <h1>Upload Your App</h1>
-<form th:action="@{/upload}" method="post" enctype="multipart/form-data">
+<form th:action="@{/app-upload}" method="post" enctype="multipart/form-data">
     <label for="appName">App Name:</label>
-    <input type="text" id="appName" name="appName" required><br><br>
+    <input type="text" id="appName" name="appName" required/><br/><br/>
 
     <label for="appFile">App File (Source Code):</label>
-    <input type="file" id="appFile" name="appFile" required><br><br>
+    <input type="file" id="appFile" name="appFile" required/><br/><br/>
 
     <label for="metadataFile">Metadata File:</label>
-    <input type="file" id="metadataFile" name="metadataFile" required><br><br>
+    <input type="file" id="metadataFile" name="metadataFile" required/><br/><br/>
 
     <button type="submit">Upload</button>
 </form>
+
 <p th:if="${message}" th:text="${message}" style="color: green;"></p>
-<p th:if="${error}" th:text="${error}" style="color: red;"></p>
+<p th:if="${error}"   th:text="${error}"   style="color: red;"></p>
 </body>
 </html>

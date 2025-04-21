@@ -1,51 +1,90 @@
 package com.example.appstore.controllers;
 
 import com.example.appstore.models.User;
-import com.example.appstore.models.AppEntry;
-import com.example.appstore.repository.UserRepository;
-import com.example.appstore.repository.AppEntryRepository;
+import com.example.appstore.services.UserService;
+import com.example.appstore.services.WarningService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserService    userService;
+    private final WarningService warningService;
 
     @Autowired
-    private AppEntryRepository appEntryRepository;
+    public AdminController(UserService userService,
+                           WarningService warningService) {
+        this.userService    = userService;
+        this.warningService = warningService;
+    }
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @GetMapping("/dashboard")
+    @GetMapping({ "", "/dashboard" })
     public String adminDashboard(Model model) {
-        List<User> users = userRepository.findAll();
-        List<AppEntry> apps = appEntryRepository.findAll();
-        model.addAttribute("users", users);
-        model.addAttribute("apps", apps);
+        model.addAttribute("user", new User());
         return "admin";
     }
 
     @PostMapping("/addAdmin")
-    public String addAdmin(@RequestParam String email, @RequestParam String password, Model model) {
-        if (userRepository.findByEmail(email) != null) {
-            model.addAttribute("error", "User already exists!");
+    public String addAdmin(@ModelAttribute("user") User user,
+                           RedirectAttributes attrs) {
+        if (userService.emailExists(user.getEmail())) {
+            attrs.addFlashAttribute("error", "Email already in use");
         } else {
-            User user = new User();
-            user.setEmail(email);
-            user.setPassword(passwordEncoder.encode(password));
             user.setRole("ADMIN");
-            userRepository.save(user);
-            model.addAttribute("message", "Admin added successfully!");
+            userService.registerUser(user);
+            attrs.addFlashAttribute("message", "Admin added successfully");
         }
         return "redirect:/admin/dashboard";
+    }
+
+    @GetMapping("/users/data")
+    @ResponseBody
+    public List<Map<String, Object>> getUsersData() {
+        return userService.getAllUsers().stream()
+                .map(u -> {
+                    Map<String,Object> m = new HashMap<>();
+                    m.put("id",        u.getId());
+                    m.put("email",     u.getEmail());
+                    m.put("role",      u.getRole());
+                    m.put("suspended", u.isSuspended());
+                    return m;
+                })
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("/users/manageSuspensions")
+    public String manageSuspensions(Model model) {
+        List<User> suspended = userService.getAllUsers().stream()
+                .filter(User::isSuspended)
+                .collect(Collectors.toList());
+        model.addAttribute("users", suspended);
+        return "manageSuspensions";
+    }
+
+    @PostMapping("/user/{id}/unsuspend")
+    public String unsuspendUser(@PathVariable Long id,
+                                RedirectAttributes attrs) {
+        User u = userService.getUserById(id);
+        if (u != null && u.isSuspended()) {
+            warningService.clearWarnings(u);
+            u.setSuspended(false);
+            userService.save(u);
+            attrs.addFlashAttribute("message",
+                    "User " + u.getEmail() + " has been reactivated and warnings cleared.");
+        } else {
+            attrs.addFlashAttribute("error",
+                    "User not found or not currently suspended.");
+        }
+        return "redirect:/admin/users/manageSuspensions";
     }
 }

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Available Apps</title>
+    <link rel="stylesheet" href="/css/styles.css"/>
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<h1>Available Apps</h1>
+
+<form th:action="@{/app-download}" method="get" class="search-form">
+    <label>
+        <input
+                type="text"
+                name="search"
+                placeholder="Search by name…"
+                th:value="${search}"
+        />
+    </label>
+    <button type="submit">Search</button>
+</form>
+
+<div class="download-grid">
+    <div class="app-card" th:each="app : ${apps}" th:data-id="${app.id}">
+        <h3 th:text="${app.appName}">App Name</h3>
+
+        <!-- Upload date removed -->
+
+        <!-- Metadata viewer -->
+        <a href="#" class="meta-btn" th:attr="data-id=${app.id}">
+            View Metadata
+        </a>
+
+        <!-- Download button pushed below -->
+        <div style="margin-top:0.5rem;">
+            <a
+                    th:href="@{/app-download/{id}(id=${app.id})}"
+                    class="download-btn"
+            >Download</a>
+        </div>
+    </div>
+</div>
+
+<!-- Modal (unchanged) -->
+<div id="metaModal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+        <button id="modalClose" class="modal-close">&times;</button>
+        <h2>Metadata JSON</h2>
+        <pre id="metaBody">{ loading… }</pre>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.meta-btn').forEach(btn => {
+        btn.addEventListener('click', async e => {
+            e.preventDefault();
+            const id = btn.getAttribute('data-id');
+            const resp = await fetch(`/app-download/${id}/metadata`);
+            document.getElementById('metaBody').textContent = await resp.text();
+            document.getElementById('metaModal').style.display = 'flex';
+        });
+    });
+    document.getElementById('modalClose').addEventListener('click', () => {
+        document.getElementById('metaModal').style.display = 'none';
+    });
+    document.getElementById('metaModal').addEventListener('click', e => {
+        if (e.target === document.getElementById('metaModal')) {
+            document.getElementById('metaModal').style.display = 'none';
+        }
+    });
+</script>
+</body>
+</html>

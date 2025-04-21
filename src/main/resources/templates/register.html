@@ -1,50 +1,64 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8"/>
     <title>Register</title>
-    <script>
-        function validateForm() {
-            let email = document.getElementById("email").value;
-            let password = document.getElementById("password").value;
-            let confirmPassword = document.getElementById("confirmPassword").value;
-            let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            let passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,25}$/;
-
-            if (!emailRegex.test(email)) {
-                alert("Please enter a valid email address.");
-                return false;
-            }
-
-            if (!passwordRegex.test(password)) {
-                alert("Password must be 8-25 characters long and include lowercase, uppercase, number, and special character.");
-                return false;
-            }
-
-            if (password !== confirmPassword) {
-                alert("Passwords do not match.");
-                return false;
-            }
-
-            return true;
-        }
-    </script>
+    <link rel="stylesheet" href="/css/styles.css"/>
 </head>
 <body>
-<h1>Register</h1>
-<form action="/register" method="post" onsubmit="return validateForm()">
-    <input type="email" id="email" name="email" placeholder="Email" required><br>
-    <input type="password" id="password" name="password" placeholder="Password" required><br>
-    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" required><br>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
 
-    <label for="role">Select Role:</label>
-    <select id="role" name="role" required>
-        <option value="USER">User</option>
-        <option value="DEVELOPER">Developer</option>
-    </select><br><br>
+<h1>Register</h1>
+
+<form th:action="@{/register}" th:object="${user}" method="post">
+    <div>
+        <label for="email">Email</label><br/>
+        <input
+                type="email"
+                id="email"
+                th:field="*{email}"
+                placeholder="you@example.com"
+                required
+        />
+    </div>
+
+    <div>
+        <label for="password">Password</label><br/>
+        <input
+                type="password"
+                id="password"
+                th:field="*{password}"
+                placeholder="Choose a password"
+                required
+        />
+    </div>
+
+    <div>
+        <label for="role">Role</label><br/>
+        <select
+                id="role"
+                th:field="*{role}"
+                required
+        >
+            <option value="" disabled>Select role…</option>
+            <option
+                    th:each="r : ${roles}"
+                    th:value="${r}"
+                    th:text="${r}"
+            ></option>
+        </select>
+    </div>
+
+
 
     <button type="submit">Register</button>
+
+    <div class="error-message" th:if="${error}" th:text="${error}"></div>
 </form>
-<p th:if="${error}" th:text="${error}" style="color:red;"></p>
+
+<p>
+    Already have an account?
+    <a th:href="@{/login}">Log in here</a>.
+</p>
 </body>
 </html>

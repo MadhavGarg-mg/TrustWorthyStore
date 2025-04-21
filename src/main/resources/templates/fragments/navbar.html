@@ -1,0 +1,35 @@
+<!-- templates/fragments/navbar.html -->
+<div th:fragment="navbar">
+    <div class="navbar">
+        <div>
+            <a th:href="@{/}">Home</a>
+        </div>
+
+        <!-- Not logged in -->
+        <div th:if="${not #authorization.expression('isAuthenticated()')}">
+            <a th:href="@{/login}">Login</a>
+            <a th:href="@{/register}">Register</a>
+        </div>
+
+        <!-- Regular User -->
+        <div th:if="${#authorization.expression('hasAuthority(''USER'')')}">
+            <a th:href="@{/app-download}">App Download</a>
+            <a th:href="@{/logout}">Logout</a>
+        </div>
+
+        <!-- Developer -->
+        <div th:if="${#authorization.expression('hasAuthority(''DEVELOPER'')')}">
+            <a th:href="@{/app-upload}">App Upload</a>
+            <a th:href="@{/app-download}">App Download</a>
+            <a th:href="@{/logout}">Logout</a>
+        </div>
+
+        <!-- Admin -->
+        <div th:if="${#authorization.expression('hasAuthority(''ADMIN'')')}">
+            <a th:href="@{/admin/dashboard}">Admin Page</a>
+            <a th:href="@{/app-upload}">App Upload</a>
+            <a th:href="@{/app-download}">App Download</a>
+            <a th:href="@{/logout}">Logout</a>
+        </div>
+    </div>
+</div>

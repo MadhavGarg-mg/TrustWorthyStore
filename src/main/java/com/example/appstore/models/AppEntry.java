@@ -13,7 +13,6 @@ public class AppEntry {
 
     private String appName;
 
-    // Store file contents as large binary objects (BLOBs)
     @Lob
     @Column(nullable = false)
     private byte[] appFile;
@@ -33,8 +32,6 @@ public class AppEntry {
         this.metadataFile = metadataFile;
         this.uploadDate = uploadDate;
     }
-
-    // Getters and Setters
 
     public Long getId() {
         return id;

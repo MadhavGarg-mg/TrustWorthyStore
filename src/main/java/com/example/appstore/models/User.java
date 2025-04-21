@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 @Entity
-@Table(name = "users")  // Optional: explicitly define the table name.
+@Table(name = "users")
 public class User implements UserDetails {
 
     @Id
@@ -19,9 +19,11 @@ public class User implements UserDetails {
     private String email;
 
     private String password;
-    
-    // Assume the role is stored as a string like "ROLE_USER", "ROLE_ADMIN", etc.
+
     private String role;
+
+    @Column(nullable = false)
+    private boolean suspended = false;
 
     public User() {}
 
@@ -60,42 +62,39 @@ public class User implements UserDetails {
         this.role = role; 
     }
 
-    // Implementation of UserDetails methods
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Wrap the role string into a SimpleGrantedAuthority.
-        // Ensure your role is stored with the "ROLE_" prefix (e.g., "ROLE_USER").
         return Collections.singletonList(new SimpleGrantedAuthority(role));
     }
 
     @Override
     public String getUsername() {
-        // In this case, we use email as the username.
         return email;
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        // Return true if the account is not expired.
         return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        // Return true if the account is not locked.
         return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        // Return true if the credentials (password) are not expired.
         return true;
     }
 
+    public boolean isSuspended() { return suspended; }
+    public void setSuspended(boolean suspended) { this.suspended = suspended; }
+
     @Override
     public boolean isEnabled() {
-        // Return true if the user is enabled.
-        return true;
+        return !suspended;
+    }
+
+    public void setId(long l) {
     }
 }
