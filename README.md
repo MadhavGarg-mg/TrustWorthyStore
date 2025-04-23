@@ -107,8 +107,9 @@ mvn clean package
 java -jar target/appstore-0.0.1-SNAPSHOT.jar
 ```
 
-- Application listens on **http://localhost:8080**
+- Application listens on **https://localhost:8443**
 - Checker listens on **http://localhost:5000**
+- Database listens on **http://localhost:3306**
 
 ---
 
@@ -132,6 +133,7 @@ docker-compose up --build
 
 - **AppStore** → https://localhost:8443
 - **Checker** → http://localhost:5000
+- **Database** → http://localhost:3306
 
 ---
 
