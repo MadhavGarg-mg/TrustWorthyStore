@@ -75,9 +75,12 @@ cd TrustWorthyStore
    ```properties
    # Flask checker URL
    environment.checker.url=http://localhost:5000/check
+   
+   # MySQL connection 
    spring.datasource.url=jdbc:mysql://localhost:3306/appstore
-   spring.datasource.username = user
-   spring.datasource.password= Password123
+   spring.datasource.username=user
+   spring.datasource.password=password123
+   server.port=3307
    ```
 
 2. **Flask Checker**  
@@ -107,9 +110,8 @@ mvn clean package
 java -jar target/appstore-0.0.1-SNAPSHOT.jar
 ```
 
-- Application listens on **https://localhost:8443**
+- Application listens on **http://localhost:8443**
 - Checker listens on **http://localhost:5000**
-- Database listens on **http://localhost:3306**
 
 ---
 
@@ -133,7 +135,7 @@ docker-compose up --build
 
 - **AppStore** → https://localhost:8443
 - **Checker** → http://localhost:5000
-- **Database** → http://localhost:3306
+- **MySQL**    → localhost:3307 (host) → container’s 3306
 
 ---
 
