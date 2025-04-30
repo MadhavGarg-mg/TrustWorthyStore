@@ -50,7 +50,7 @@ Admins can manage users, issue warnings, and clear suspensions.
 
 ## Prerequisites
 
-- **Java 17** (or later)
+- **Java 17+**
 - **Maven 3.6+**
 - **Python 3.8+**
 - **Docker 20.10+** & **Docker Compose 1.27+**
@@ -110,7 +110,7 @@ mvn clean package
 java -jar target/appstore-0.0.1-SNAPSHOT.jar
 ```
 
-- Application listens on **http://localhost:8443**
+- Application listens on **https://localhost:8443**
 - Checker listens on **http://localhost:5000**
 
 ---
