@@ -10,8 +10,21 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
+    env:
+      DATASOURCE_NAME:        ${{ secrets.DATASOURCE_NAME }}
+      DATASOURCE_USERNAME:    ${{ secrets.DATASOURCE_USERNAME }}
+      DATASOURCE_PASSWORD:    ${{ secrets.DATASOURCE_PASSWORD }}
+      CHECKER_URL:            ${{ secrets.CHECKER_URL }}
+      ADMIN_USERNAME:         ${{ secrets.ADMIN_USERNAME }}
+      ADMIN_PASSWORD:         ${{ secrets.ADMIN_PASSWORD }}
+      SSL_KEY_STORE_PASSWORD: ${{ secrets.SSL_KEY_STORE_PASSWORD }}
+
     steps:
       - uses: actions/checkout@v4
+
+      - name: Compute DATASOURCE_URL
+        run: |
+          echo "DATASOURCE_URL=jdbc:mysql://mysql:3306/$DATASOURCE_NAME" >> $GITHUB_ENV
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -27,5 +40,5 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-m2-
 
-      - name: Build & run tests
+      - name: Build & run Java tests
         run: mvn --batch-mode --update-snapshots clean test

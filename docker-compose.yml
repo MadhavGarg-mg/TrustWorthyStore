@@ -3,10 +3,10 @@ services:
     image: mysql:8
     restart: always
     environment:
-      MYSQL_DATABASE: appstore
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password123
-      MYSQL_ROOT_PASSWORD: password123
+      MYSQL_DATABASE: ${DATASOURCE_NAME}
+      MYSQL_USER: ${DATASOURCE_USERNAME}
+      MYSQL_PASSWORD: ${DATASOURCE_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DATASOURCE_PASSWORD}
     ports:
       - "3307:3306"
     volumes:
@@ -19,31 +19,35 @@ services:
     networks:
       - appnet
 
-  appstore:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    depends_on:
-      mysql:
-        condition: service_healthy
-      checker:
-        condition: service_started
-    ports:
-      - "8443:8443"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/appstore
-      SPRING_DATASOURCE_USERNAME: user
-      SPRING_DATASOURCE_PASSWORD: password123
-      CHECKER_URL: http://checker:5000
-    networks:
-      - appnet
-
   checker:
     build:
       context: ./checker
       dockerfile: Dockerfile.checker
     ports:
       - "5000:5000"
+    networks:
+      - appnet
+
+  appstore:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8443:8443"
+    env_file:
+      - .env
+    environment:
+      - SPRING_DATASOURCE_URL=${DATASOURCE_URL}
+      - SPRING_DATASOURCE_USERNAME=${DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DATASOURCE_PASSWORD}
+      - CHECKER_URL=${CHECKER_URL}
+      - ADMIN_USERNAME=${ADMIN_USERNAME}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      checker:
+        condition: service_started
     networks:
       - appnet
 

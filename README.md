@@ -50,7 +50,7 @@ Admins can manage users, issue warnings, and clear suspensions.
 
 ## Prerequisites
 
-- **Java 17+**
+- **Java 17** (or later)
 - **Maven 3.6+**
 - **Python 3.8+**
 - **Docker 20.10+** & **Docker Compose 1.27+**
@@ -68,30 +68,46 @@ cd TrustWorthyStore
 
 ### Configuration
 
-1. **Spring Boot**  
-   Edit `src/main/resources/application.properties`
+All secrets and connection strings are now loaded via a `.env` file.
 
-   To Ensure that the project works
-   ```properties
-   # Flask checker URL
-   environment.checker.url=http://localhost:5000/check
-   
-   # MySQL connection 
-   spring.datasource.url=jdbc:mysql://localhost:3306/appstore
-   spring.datasource.username=user
-   spring.datasource.password=password123
-   server.port=3307
-   ```
+> Create a file named `.env` at the **project root** (next to `docker-compose.yml`) with:
+> 
+```dotenv
+# MySQL database
+DATASOURCE_NAME=" "
+DATASOURCE_URL="jdbc:mysql://mysql:3306/${DATASOURCE_NAME}"
+DATASOURCE_USERNAME=" "
+DATASOURCE_PASSWORD=" "
 
-2. **Flask Checker**  
-   Located under `checker`:
+# Flask checker
+CHECKER_URL="http://checker:5000/check"
 
-    - `checker.py` implements `check` endpoint.
-    - `requirements.txt` lists dependencies.
+# Admin bootstrapping
+ADMIN_USERNAME=" "
+ADMIN_PASSWORD=" "
 
+# SSL keystore
+SSL_KEY_STORE_PASSWORD=" "
+```
+>> **Do not** commit `.env`; add it to your `.gitignore`.
+
+Spring Boot’s `application.properties` should use these placeholders:
+```properties
+spring.datasource.url=${DATASOURCE_URL}
+spring.datasource.username=${DATASOURCE_USERNAME}
+spring.datasource.password=${DATASOURCE_PASSWORD}
+
+environment.checker.url=${CHECKER_URL}
+
+server.port=8443
+server.ssl.key-store=classpath:keystore.p12
+server.ssl.key-store-password=${SSL_KEY_STORE_PASSWORD}
+server.ssl.key-store-type=PKCS12
+server.ssl.key-alias=tomcat
+```
 ---
 
-### Build & Run Locally
+#### Build & Run Locally
 
 #### 1. Start Flask Checker
 
@@ -100,18 +116,20 @@ cd checker
 pip install -r requirements.txt
 export FLASK_APP=checker.py
 flask run --host=0.0.0.0 --port=5000
+
 ```
 
 #### 2. Build & Run Spring Boot
 
+
+Ensure your .env file (from the Configuration section) is present in the project root before running these commands.
+
 ```bash
 cd ..
-mvn clean package
-java -jar target/appstore-0.0.1-SNAPSHOT.jar
+mvn spring-boot:run
 ```
 
 - Application listens on **https://localhost:8443**
-- Checker listens on **http://localhost:5000**
 
 ---
 
@@ -133,11 +151,14 @@ mvn test
 docker-compose up --build
 ```
 
-- **AppStore** → https://localhost:8443
-- **Checker** → http://localhost:5000
-- **MySQL**    → localhost:3307 (host) → container’s 3306
+Go to: https://localhost:8443
 
----
+```diff
+## Docker Setup
+
+>> **Ensure your `.env` file is present** (in the same directory as your `docker-compose.yml`).  
+>> Docker Compose will automatically load it and inject the variables into each service.
+```
 
 ## Endpoints & Usage
 
